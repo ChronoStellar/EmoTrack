@@ -10,9 +10,22 @@
 		9B8AC26C2DE43FD6007AA494 /* EmoTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmoTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9BB6C1CE2DE4B4FD00337E43 /* Exceptions for "EmoTrack" folder in "EmoTrack" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9B8AC26B2DE43FD6007AA494 /* EmoTrack */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9B8AC26E2DE43FD6007AA494 /* EmoTrack */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9BB6C1CE2DE4B4FD00337E43 /* Exceptions for "EmoTrack" folder in "EmoTrack" target */,
+			);
 			path = EmoTrack;
 			sourceTree = "<group>";
 		};
@@ -258,6 +271,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EmoTrack/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "this app needs permision to use camera to function correctly";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -285,6 +300,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EmoTrack/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "this app needs permision to use camera to function correctly";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
