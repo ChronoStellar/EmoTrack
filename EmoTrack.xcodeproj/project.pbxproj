@@ -21,6 +21,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		9B219D312DE61F43000FD5A9 /* ViewModel */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		9B8AC26E2DE43FD6007AA494 /* EmoTrack */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -47,6 +52,7 @@
 			children = (
 				9B8AC26E2DE43FD6007AA494 /* EmoTrack */,
 				9B8AC26D2DE43FD6007AA494 /* Products */,
+				9B219D312DE61F43000FD5A9 /* ViewModel */,
 			);
 			sourceTree = "<group>";
 		};
@@ -74,6 +80,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				9B219D312DE61F43000FD5A9 /* ViewModel */,
 				9B8AC26E2DE43FD6007AA494 /* EmoTrack */,
 			);
 			name = EmoTrack;

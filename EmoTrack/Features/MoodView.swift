@@ -1,64 +1,108 @@
-//
-//  MoodView.swift
-//  EmoTrack
-//
-//  Created by Hendrik Nicolas Carlo on 27/05/25.
-//
-
 import SwiftUI
 
-// Mood View with Camera
 struct MoodView: View {
     @StateObject private var cameraManager = CameraManager()
+    @StateObject private var viewModel: MoodViewModel
     @State private var isCameraActive = false
     
+    init() {
+        let cameraManager = CameraManager()
+        self._cameraManager = StateObject(wrappedValue: cameraManager)
+        self._viewModel = StateObject(wrappedValue: MoodViewModel(cameraManager: cameraManager))
+    }
+    
     var body: some View {
-        VStack {
-            if cameraManager.isAuthorized {
-                if isCameraActive {
-                    CameraView(session: cameraManager.session)
-                        .frame(maxHeight: .infinity)
-                        .background(Color.gray.opacity(0.1))
+        ZStack {
+            VStack {
+                // Display predicted emotion with dynamic background color
+                Text("Mood: \(viewModel.emotion)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(viewModel.backgroundColor.opacity(0.7))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.top)
+                
+                // Display captured image or camera feed
+                if cameraManager.isAuthorized {
+                    if let capturedImage = cameraManager.capturedImage {
+                        Image(nsImage: capturedImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                    } else if isCameraActive {
+                        CameraView(session: cameraManager.session)
+                            .frame(maxHeight: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                    } else {
+                        Image(systemName: "video.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                    }
+                } else if let errorMessage = cameraManager.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    Image(systemName: "video.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: .infinity)
-                        .background(Color.gray.opacity(0.1))
+                    ProgressView("Requesting camera access...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            } else if let errorMessage = cameraManager.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ProgressView("Requesting camera access...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            
-            // Bottom Bar
-            HStack {
-                Spacer()
-                Button(action: {
-                    cameraManager.capturePhoto()
-                }) {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
-                        .clipShape(Circle())
+                
+                // Bottom Bar
+                HStack {
+                    Button(action: {
+                        cameraManager.capturePhoto()
+                    }) {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    if cameraManager.capturedImage != nil {
+                        Button(action: {
+                            cameraManager.clearCapturedImage()
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.red)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    
+                    // Debug buttons to test emotions
+//                    Button(action: {
+//                        viewModel.setEmotion("Happy")
+//                    }) {
+//                        Text("Test Happy")
+//                            .padding()
+//                            .background(Color.gray)
+//                            .foregroundColor(.white)
+//                            .clipShape(Capsule())
+//                    }
+//                    
+//                    Button(action: {
+//                        viewModel.setEmotion("Angry")
+//                    }) {
+//                        Text("Test Angry")
+//                            .padding()
+//                            .background(Color.gray)
+//                            .foregroundColor(.white)
+//                            .clipShape(Capsule())
+//                    }
                 }
-                .buttonStyle(PlainButtonStyle())
-                
-                Text(cameraManager.predictedEmotion)
-                    .foregroundColor(.gray)
-                Image(systemName: "questionmark")
-                    .foregroundColor(.yellow)
-                
-                Spacer()
+                .padding()
             }
-            .padding()
-            .background(Color.gray.opacity(0.2))
         }
         .navigationTitle("Mood")
         .task {

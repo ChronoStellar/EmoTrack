@@ -1,22 +1,15 @@
-//
-//  CameraManager.swift
-//  EmoTrack
-//
-//  Created by Hendrik Nicolas Carlo on 27/05/25.
-//
-
 import Foundation
 import AVFoundation
 import CoreML
 import Vision
 import AppKit
 
-// Camera Manager to handle authorization, session, and CoreML prediction
 class CameraManager: NSObject, ObservableObject {
     let session = AVCaptureSession()
     @Published var isAuthorized = false
     @Published var errorMessage: String? = nil
-    @Published var predictedEmotion: String = "Confused" // Default emotion
+    @Published var predictedEmotion: String = "" // Default emotion
+    @Published var capturedImage: NSImage? = nil // Store captured image
     private var photoOutput = AVCapturePhotoOutput()
     
     override init() {
@@ -103,32 +96,39 @@ class CameraManager: NSObject, ObservableObject {
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
     
+    func clearCapturedImage() {
+        DispatchQueue.main.async {
+            self.capturedImage = nil
+            self.predictedEmotion = "" // Reset emotion
+            self.startSession() // Resume camera session
+        }
+    }
+    
     private func predictEmotion(from image: CGImage) async {
         do {
-            // Load the CoreML model
             let model = try fer2013_acc37(configuration: MLModelConfiguration())
-            
-            // Create a Vision request
             let vnModel = try VNCoreMLModel(for: model.model)
             let request = VNCoreMLRequest(model: vnModel) { request, error in
                 guard let results = request.results as? [VNClassificationObservation],
                       let topResult = results.first else {
+                    print("Prediction failed: No results or error: \(error?.localizedDescription ?? "Unknown error")")
                     DispatchQueue.main.async {
                         self.predictedEmotion = "Unknown"
                     }
                     return
                 }
+                print("Raw model output: \(results.map { "\($0.identifier) (\($0.confidence))" })")
                 DispatchQueue.main.async {
                     self.predictedEmotion = topResult.identifier
+                    print("Updated predictedEmotion: \(self.predictedEmotion)")
                 }
             }
-            
-            // Resize and process the image
             let handler = VNImageRequestHandler(cgImage: image, options: [:])
             try handler.perform([request])
         } catch {
             DispatchQueue.main.async {
                 self.errorMessage = "Failed to predict emotion: \(error.localizedDescription)"
+                print("Prediction error: \(error.localizedDescription)")
             }
         }
     }
@@ -150,6 +150,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 self.errorMessage = "Failed to process captured image."
             }
             return
+        }
+        
+        DispatchQueue.main.async {
+            self.capturedImage = nsImage // Store the captured image
+            self.stopSession() // Stop the camera session
         }
         
         Task {
